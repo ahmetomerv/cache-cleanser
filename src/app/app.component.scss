@@ -1,0 +1,16 @@
+.extension-container {
+  padding: 1em;
+  border: 2px solid #232728;
+  width: 400px;
+  height: 100%;
+}
+
+.whitelist-container {
+  padding-left: 0;
+  list-style: none;
+
+  li .whitelist-remove-icon {
+    margin-left: .5em;
+    cursor: pointer;
+  }
+}

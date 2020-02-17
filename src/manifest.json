@@ -1,0 +1,49 @@
+{
+  "name": "Cache Cleanser",
+  "author": "Ahmet Ömer",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "Simple cache cleaner extension for Chrome browsers.",
+  "icons": {
+    "16": "assets/brush.png",
+    "48": "assets/brush.png",
+    "128": "assets/brush.png"
+  },
+  "browser_action": {
+    "name": "Cache Cleanser",
+    "title": "Auto cache clean is disabled",
+    "default_icon": "assets/brush.png",
+    "default_popup": "index.html"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_page": "options.html",
+  "incognito": "split",
+  "offline_enabled": false,
+  "content_security_policy": "script-src 'self' 'unsafe-eval';object-src 'self';",
+  "minimum_chrome_version": "34",
+  "permissions": [
+    "browsingData",
+    "<all_urls>",
+    "tabs",
+    "http://*/*",
+    "https://*/*",
+    "webRequest",
+    "webRequestBlocking",
+    "webNavigation",
+    "activeTab",
+    "storage"
+  ]
+}

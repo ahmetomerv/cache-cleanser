@@ -1,0 +1,30 @@
+<div class="extension-container">
+  <h1>Cache Cleanser</h1>
+  <h3>Settings:</h3>
+
+  <button (click)="clearCacheClick()">CLEAR CACHE</button>
+
+  <br>
+
+  <label for="cache-enabled-input">Enable cache clean: </label>
+  <input [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
+  <em style="opacity: .5; margin-left: .5em;">{{!cacheEnabled ? '' : 'Cache will be cleaned in all sites.'}}</em>
+
+  <br>
+
+  <label for="whitelist-input">Whitelist: </label>
+  <input id="whitelist-input" [(ngModel)]="whitelistInputValue" type="text">
+  <button [disabled]="!whitelistInputValue" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
+
+  <br>
+
+  <div>
+    <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites added to the whitelist</em>
+  </div>
+
+  <ul *ngIf="this.whitelist.length" class="whitelist-container">
+    <li *ngFor="let url of whitelist">
+      {{ url }} <i (click)="removeWhitelistItemClick(url)" class="fa fa-times whitelist-remove-icon"></i>
+    </li>
+  </ul>
+</div>
