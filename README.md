@@ -26,3 +26,5 @@
 
 - Select the `dist` folder in `cache-cleanser` project folder
 
+---
+[MIT License](https://opensource.org/licenses/MIT)
