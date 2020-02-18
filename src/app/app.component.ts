@@ -15,14 +15,24 @@ export class AppComponent implements OnInit {
   whitelist: string[] = [];
 
   ngOnInit(): void {
+    chrome.storage.sync.get(['cacheEnabled'], (result) => {
+      this.cacheEnabled = result.cacheEnabled;
+    });
+
     this.getWhitelistFromLocalStorage();
     this.setCurrentTabHostname();
   }
 
-  clearCacheClick() {
+  clearCacheClick(): void {
     if (this.cacheEnabled) {
       this.clearCache();
     }
+  }
+  
+  cacheEnableChange(event): void {
+    this.cacheEnabled = event.target.checked;
+    
+    chrome.storage.sync.set({cacheEnabled: this.cacheEnabled}, () => {});
   }
 
   addToWhitelist(url: string): void {
@@ -30,7 +40,6 @@ export class AppComponent implements OnInit {
     this.whitelistInputValue = '';
 
     chrome.storage.sync.set({whitelistItems: this.whitelist}, () => {});
-    chrome.storage.sync.get(['whitelistItems'], (result) => {});
   }
 
   getWhitelistFromLocalStorage(): void {

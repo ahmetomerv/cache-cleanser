@@ -5,9 +5,10 @@
   <button (click)="clearCacheClick()">CLEAR CACHE</button>
 
   <br>
+  <br>
 
   <label for="cache-enabled-input">Enable cache clean: </label>
-  <input [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
+  <input (change)="cacheEnableChange($event)" [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
   <em style="opacity: .5; margin-left: .5em;">{{!cacheEnabled ? '' : 'Cache will be cleaned in all sites.'}}</em>
 
   <br>
@@ -19,7 +20,7 @@
   <br>
 
   <div>
-    <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites added to the whitelist</em>
+    <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites added to the whitelist. (Example: https://google.com)</em>
   </div>
 
   <ul *ngIf="this.whitelist.length" class="whitelist-container">
