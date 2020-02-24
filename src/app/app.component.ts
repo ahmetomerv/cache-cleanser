@@ -9,86 +9,66 @@ import Tab = chrome.tabs.Tab;
 export class AppComponent implements OnInit {
   constructor() {}
 
-  cacheEnabled: false;
-  currentDomain: string;
-  whitelistInputValue: string = null;
-  whitelist: string[] = [];
+  private cacheEnabled: false;
+  private currentDomain: string;
+  private whitelistInputValue: string = null;
+  private whitelist: string[] = [];
 
   ngOnInit(): void {
     chrome.storage.sync.get(['cacheEnabled'], (result) => {
       this.cacheEnabled = result.cacheEnabled;
+      console.log('Cache Enabled: ' + this.cacheEnabled);
     });
 
     this.getWhitelistFromLocalStorage();
-    this.setCurrentTabHostname();
+    this.setCurrentTabUrl();
+  }
+
+  connectToBackgroundScript(messagePayload): void {
+    const message = { messagePayload };
+    const messageSendCallback = () => {};
+
+    chrome.runtime.sendMessage(message, messageSendCallback);
   }
 
   clearCacheClick(): void {
-    if (this.cacheEnabled) {
-      this.clearCache();
-    }
+    this.connectToBackgroundScript({
+      cacheCleanType: 'total'
+    });
   }
-  
+
   cacheEnableChange(event): void {
     this.cacheEnabled = event.target.checked;
-    
     chrome.storage.sync.set({cacheEnabled: this.cacheEnabled}, () => {});
   }
 
   addToWhitelist(url: string): void {
     this.whitelist.push(url);
     this.whitelistInputValue = '';
-
-    chrome.storage.sync.set({whitelistItems: this.whitelist}, () => {});
+    this.updateWhitelistInLocalStorage();
   }
 
   getWhitelistFromLocalStorage(): void {
     chrome.storage.sync.get(['whitelistItems'], (result) => {
       if (result.whitelistItems) {
         this.whitelist = result.whitelistItems;
+        console.log(this.whitelist);
       }
     });
   }
 
+  updateWhitelistInLocalStorage(): void {
+    chrome.storage.sync.set({whitelistItems: this.whitelist}, () => {});
+  }
+
   removeWhitelistItemClick(url: string): void {
     this.whitelist = this.whitelist.filter(x => x !== url);
+    this.updateWhitelistInLocalStorage();
   }
 
-  clearCache(): void {
-    const callback = () => {
-      alert('cache cleared.');
-    };
-
-    const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
-    const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
-
-    chrome.browsingData.remove({
-      since: oneWeekAgo
-    }, {
-      appcache: true,
-      cache: true,
-      cookies: true,
-      downloads: true,
-      fileSystems: true,
-      formData: true,
-      history: false,
-      indexedDB: true,
-      localStorage: true,
-      pluginData: true,
-      passwords: false,
-      serviceWorkers: true,
-      webSQL: true
-    }, callback);
-
-  }
-
-  setCurrentTabHostname(): void {
-    let url: string;
-    let domain: string;
-
+  setCurrentTabUrl(): void {
     chrome.tabs.getSelected(null, (tab: Tab) => {
-      url = tab.url;
-      domain = (new URL(url)).hostname;
+      const domain = (new URL(tab.url)).hostname;
       this.currentDomain = domain;
     });
   }

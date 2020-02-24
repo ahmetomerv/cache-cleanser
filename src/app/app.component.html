@@ -1,16 +1,12 @@
 <div class="extension-container">
   <h1>Cache Cleanser</h1>
+  <p>Auto cache cleaner.</p>
   <h3>Settings:</h3>
 
-  <button (click)="clearCacheClick()">CLEAR CACHE</button>
-
+  <label for="cache-enabled-input">Enable total cache clean: </label>
+  <input [disabled]="whitelist.length > 0" (change)="cacheEnableChange($event)" [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
   <br>
-  <br>
-
-  <label for="cache-enabled-input">Enable cache clean: </label>
-  <input (change)="cacheEnableChange($event)" [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
-  <em style="opacity: .5; margin-left: .5em;">{{!cacheEnabled ? '' : 'Cache will be cleaned in all sites.'}}</em>
-
+  <em style="opacity: .5; margin-left: .5em;">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
   <br>
 
   <label for="whitelist-input">Whitelist: </label>
@@ -19,13 +15,16 @@
 
   <br>
 
-  <div>
-    <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites added to the whitelist. (Example: https://google.com)</em>
-  </div>
+  <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites that are added to the whitelist.</em>
+  <br>
+  <em style="opacity: .5; margin-left: .5em;" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
 
   <ul *ngIf="this.whitelist.length" class="whitelist-container">
     <li *ngFor="let url of whitelist">
       {{ url }} <i (click)="removeWhitelistItemClick(url)" class="fa fa-times whitelist-remove-icon"></i>
     </li>
   </ul>
+
+  <br><br>
+  <button (click)="clearCacheClick()">MANUAL CACHE CLEAN</button>
 </div>
