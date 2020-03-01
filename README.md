@@ -1,4 +1,5 @@
-# Cache Cleanser Chrome extension
+# Cache Cleanser
+A chrome browser extension to clear cache, cookies and storage for specific or every domain manually or automatically after loaded
 
 ### To install and use it in your local machine:
 
@@ -22,7 +23,7 @@
 
 - Enable "Developer Mode"
 
-- Click "Load unpacked extension"
+- Click "Load unpacked"
 
 - Select the `dist` folder in `cache-cleanser` project folder
 
