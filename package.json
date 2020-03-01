@@ -15,7 +15,7 @@
     "build:production": "npm run build:angular-production && npm run build:chrome-production && npm run pack",
     "watch": "npm run clean && npm-run-all --parallel watch:*",
     "clean": "rimraf dist",
-    "pack": "cd dist && bestzip ../../extension-build.zip *"
+    "pack": "cd dist && bestzip ../dist/extension-build.zip *"
   },
   "private": true,
   "dependencies": {
