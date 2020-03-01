@@ -6,7 +6,7 @@
   <label for="cache-enabled-input">Enable total cache clean: </label>
   <input [disabled]="whitelist.length > 0" (change)="cacheEnableChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
   <br>
-  <em style="opacity: .5; margin-left: .5em;">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
+  <em class="settings-note">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
   <br>
 
   <label for="whitelist-input">Whitelist: </label>
@@ -15,9 +15,9 @@
 
   <br>
 
-  <em style="opacity: .5; margin-left: .5em;">Enable cache clean only on sites that are added to the whitelist.</em>
+  <em class="settings-note">Enable cache clean only on sites that are added to the whitelist.</em>
   <br>
-  <em style="opacity: .5; margin-left: .5em;" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
+  <em class="settings-note" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
 
   <ul *ngIf="this.whitelist.length" class="whitelist-container">
     <li *ngFor="let url of whitelist">
@@ -26,5 +26,5 @@
   </ul>
 
   <br><br>
-  <button [disabled]="!cleanCacheEnabled && whitelist.length === 0" (click)="clearCacheClick()">CLEAR CACHE</button>
+  <button [disabled]="!cleanCacheEnabled && whitelist.length === 0" (click)="clearCacheClick()">Clear Cache</button>
 </div>

@@ -40,9 +40,6 @@
     "tabs",
     "http://*/*",
     "https://*/*",
-    "webRequestBlocking",
-    "webNavigation",
-    "webRequest",
     "activeTab",
     "storage"
   ]
