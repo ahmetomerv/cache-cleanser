@@ -1,16 +1,16 @@
 <div class="extension-container">
   <h1>Cache Cleanser</h1>
-  <p>Auto cache cleaner.</p>
+  <p>Clean cache and storage for specific or every site manually or automatically after loaded.</p>
   <h3>Settings:</h3>
 
   <label for="cache-enabled-input">Enable total cache clean: </label>
-  <input [disabled]="whitelist.length > 0" (change)="cacheEnableChange($event)" [(ngModel)]="cacheEnabled" id="cache-enabled-input" type="checkbox">
+  <input [disabled]="whitelist.length > 0" (change)="cacheEnableChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
   <br>
   <em style="opacity: .5; margin-left: .5em;">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
   <br>
 
   <label for="whitelist-input">Whitelist: </label>
-  <input id="whitelist-input" [(ngModel)]="whitelistInputValue" type="text">
+  <input id="whitelist-input" [disabled]="cleanCacheEnabled" [(ngModel)]="whitelistInputValue" type="text">
   <button [disabled]="!whitelistInputValue" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
 
   <br>
@@ -26,5 +26,5 @@
   </ul>
 
   <br><br>
-  <button (click)="clearCacheClick()">MANUAL CACHE CLEAN</button>
+  <button [disabled]="!cleanCacheEnabled && whitelist.length === 0" (click)="clearCacheClick()">CLEAR CACHE</button>
 </div>

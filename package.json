@@ -37,7 +37,7 @@
     "@angular/cli": "^8.2.0",
     "@angular/compiler-cli": "^8.2.0",
     "@angular/language-service": "^8.2.0",
-    "@types/chrome": "0.0.81",
+    "@types/chrome": "0.0.97",
     "@types/node": "~8.9.4",
     "awesome-typescript-loader": "^5.2.1",
     "bestzip": "^2.1.2",

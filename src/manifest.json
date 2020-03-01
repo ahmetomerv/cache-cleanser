@@ -19,7 +19,7 @@
     "scripts": [
       "background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "content_scripts": [
     {
@@ -42,6 +42,7 @@
     "https://*/*",
     "webRequestBlocking",
     "webNavigation",
+    "webRequest",
     "activeTab",
     "storage"
   ]

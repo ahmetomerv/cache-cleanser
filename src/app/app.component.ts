@@ -9,23 +9,24 @@ import Tab = chrome.tabs.Tab;
 export class AppComponent implements OnInit {
   constructor() {}
 
-  private cacheEnabled: false;
+  private cleanCacheEnabled: false;
   private currentDomain: string;
   private whitelistInputValue: string = null;
   private whitelist: string[] = [];
 
   ngOnInit(): void {
-    chrome.storage.sync.get(['cacheEnabled'], (result) => {
-      this.cacheEnabled = result.cacheEnabled;
-      console.log('Cache Enabled: ' + this.cacheEnabled);
+    chrome.storage.sync.get(['cleanCacheEnabled'], (result) => {
+      this.cleanCacheEnabled = result.cleanCacheEnabled;
     });
 
     this.getWhitelistFromLocalStorage();
     this.setCurrentTabUrl();
+
+    setTimeout(() => this.cleanCacheEnabled = this.cleanCacheEnabled, 0);
   }
 
   connectToBackgroundScript(messagePayload): void {
-    const message = { messagePayload };
+    const message = messagePayload;
     const messageSendCallback = () => {};
 
     chrome.runtime.sendMessage(message, messageSendCallback);
@@ -38,8 +39,8 @@ export class AppComponent implements OnInit {
   }
 
   cacheEnableChange(event): void {
-    this.cacheEnabled = event.target.checked;
-    chrome.storage.sync.set({cacheEnabled: this.cacheEnabled}, () => {});
+    this.cleanCacheEnabled = event.target.checked;
+    chrome.storage.sync.set({cleanCacheEnabled: this.cleanCacheEnabled}, () => {});
   }
 
   addToWhitelist(url: string): void {
@@ -52,7 +53,6 @@ export class AppComponent implements OnInit {
     chrome.storage.sync.get(['whitelistItems'], (result) => {
       if (result.whitelistItems) {
         this.whitelist = result.whitelistItems;
-        console.log(this.whitelist);
       }
     });
   }
