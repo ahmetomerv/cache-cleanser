@@ -22,15 +22,17 @@ console.log('background.ts run.');
   }
 
   function getLocalStorageData(key: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      chrome.storage.sync.get(key, (result: any) => {
-        chrome.runtime.lastError
-            ? reject(Error(chrome.runtime.lastError.message))
-            : resolve(result[key]);
-          }
-        );
-      }
-    );
+    if (key && typeof key === 'string') {
+      return new Promise((resolve, reject) => {
+        chrome.storage.sync.get(key, (result: any) => {
+          chrome.runtime.lastError
+              ? reject(Error(chrome.runtime.lastError.message))
+              : resolve(result[key]);
+            }
+          );
+        }
+      );
+    }
   }
 
   function getCurrentTabDomainAddress(): string {
