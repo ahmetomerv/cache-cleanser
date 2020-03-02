@@ -60,10 +60,13 @@ console.log('background.ts run.');
     console.log('cleanCacheCallback was called.');
   }
 
-  function totalCacheClean(): void {
+  async function totalCacheClean(): Promise<void> {
     console.log('totalCacheClean was called.');
     const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
     const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
+    let cleanCookiesEnabled: boolean;
+
+    await getLocalStorageData('cleanCookiesEnabled').then((result: any) => cleanCookiesEnabled = result);
 
     if (!cacheCleanRunning) {
       cacheCleanRunning = true;
@@ -72,7 +75,7 @@ console.log('background.ts run.');
       }, {
         appcache: true,
         cache: true,
-        cookies: true,
+        cookies: cleanCookiesEnabled,
         indexedDB: true,
         localStorage: true,
         serviceWorkers: true,
@@ -87,8 +90,10 @@ console.log('background.ts run.');
       const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
       const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
       let whitelist: string;
+      let cleanCookiesEnabled: boolean;
 
       await getLocalStorageData('whitelistItems').then((result: any) => whitelist = result);
+      await getLocalStorageData('cleanCookiesEnabled').then((result: any) => cleanCookiesEnabled = result);
 
       if (whitelist && whitelist.length > 0) {
         cacheCleanRunning = true;
@@ -100,7 +105,7 @@ console.log('background.ts run.');
         }, {
           appcache: true,
           cache: true,
-          cookies: true,
+          cookies: cleanCookiesEnabled,
           indexedDB: true,
           localStorage: true,
           serviceWorkers: true,

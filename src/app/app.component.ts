@@ -10,6 +10,7 @@ export class AppComponent implements OnInit {
   constructor() {}
 
   private cleanCacheEnabled: false;
+  private cleanCookiesEnabled: false;
   private currentDomain: string;
   private whitelistInputValue: string = null;
   private whitelist: string[] = [];
@@ -38,9 +39,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  cacheEnableChange(event): void {
-    this.cleanCacheEnabled = event.target.checked;
-    chrome.storage.sync.set({cleanCacheEnabled: this.cleanCacheEnabled}, () => {});
+  settingsInputChange(event: any): void {
+    chrome.storage.sync.set({
+        cleanCacheEnabled: this.cleanCacheEnabled,
+        cleanCookiesEnabled: this.cleanCookiesEnabled
+      }, () => {});
   }
 
   addToWhitelist(url: string): void {

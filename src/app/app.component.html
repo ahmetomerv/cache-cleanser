@@ -3,10 +3,14 @@
   <p>Clear cache, cookies and storage for specific or every domain manually or automatically after loaded.</p>
   <h3>Settings:</h3>
 
-  <label for="cache-enabled-input">Enable total cache clean: </label>
-  <input [disabled]="whitelist.length > 0" (change)="cacheEnableChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
+  <label for="cache-enabled-input">Enable cache clean: </label>
+  <input [disabled]="whitelist.length > 0" (change)="settingsInputChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
   <br>
   <em class="settings-note">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
+  <br>
+
+  <label for="cookies-enabled-input">Enable cookies clean: </label>
+  <input [disabled]="whitelist.length > 0" (change)="settingsInputChange($event)" [(ngModel)]="cleanCookiesEnabled" id="cookies-enabled-input" type="checkbox">
   <br>
 
   <label for="whitelist-input">Whitelist: </label>
