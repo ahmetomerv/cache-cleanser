@@ -20,6 +20,10 @@ export class AppComponent implements OnInit {
       this.cleanCacheEnabled = result.cleanCacheEnabled;
     });
 
+    chrome.storage.sync.get(['cleanCookiesEnabled'], (result) => {
+      this.cleanCookiesEnabled = result.cleanCookiesEnabled;
+    });
+
     this.getWhitelistFromLocalStorage();
     this.setCurrentTabUrl();
 
