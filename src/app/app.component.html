@@ -3,25 +3,28 @@
   <p>Clear cache, cookies and storage for specific or every domain manually or automatically after loaded.</p>
   <h3>Settings:</h3>
 
-  <label for="cache-enabled-input">Enable cache clean: </label>
-  <input [disabled]="whitelist.length > 0" (change)="settingsInputChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
-  <br>
-  <em class="settings-note">{{whitelist.length > 0 ? 'Cache will be cleaned only in sites includes in the whitelist.' : 'Cache will be cleaned in all sites. '}}</em>
-  <br>
+  <div>
+    <label for="cache-enabled-input">Enable cache clean: </label>
+    <input (change)="settingsInputChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
+  </div>
 
-  <label for="cookies-enabled-input">Enable cookies clean: </label>
-  <input [disabled]="whitelist.length > 0" (change)="settingsInputChange($event)" [(ngModel)]="cleanCookiesEnabled" id="cookies-enabled-input" type="checkbox">
-  <br>
+  <div>
+    <label for="cookies-enabled-input">Enable cookies clean: </label>
+    <input (change)="settingsInputChange($event)" [(ngModel)]="cleanCookiesEnabled" id="cookies-enabled-input" type="checkbox">
+  </div>
 
-  <label for="whitelist-input">Whitelist: </label>
-  <input id="whitelist-input" [disabled]="cleanCacheEnabled" [(ngModel)]="whitelistInputValue" type="text">
-  <button [disabled]="!whitelistInputValue" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
+  <div>
+    <label for="whitelist-input">Whitelist: </label>
+    <input id="whitelist-input" [(ngModel)]="whitelistInputValue" type="text">
+    <button [disabled]="!whitelistInputValue" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
+  </div>
 
-  <br>
-
-  <em class="settings-note">Enable cache clean only on sites that are added to the whitelist.</em>
-  <br>
-  <em class="settings-note" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
+  <div>
+    <em class="settings-note">Enable cleaning only on sites that are added to the whitelist.</em>
+  </div>
+  <div>
+    <em class="settings-note" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
+  </div>
 
   <ul *ngIf="this.whitelist.length" class="whitelist-container">
     <li *ngFor="let url of whitelist">
@@ -29,6 +32,16 @@
     </li>
   </ul>
 
-  <br><br>
-  <button [disabled]="!cleanCacheEnabled && whitelist.length === 0" (click)="clearCacheClick()">Clear Cache</button>
+  <div>
+    <button class="button" (click)="clearClick()">Manual Clear</button>
+  </div>
+
+  <div class="settings-note">
+    {{ whitelist.length > 0 && cleanCacheEnabled ? 'Cache will be cleaned only in sites included in the whitelist' :  cleanCacheEnabled ? 'Cache will be cleaned in all sites' : ''}}
+  </div>
+
+  <div class="settings-note">
+    {{ whitelist.length > 0 && cleanCookiesEnabled ? 'Cookies will be cleaned only in sites included in the whitelist' :  cleanCookiesEnabled ? 'Cookies will be cleaned in all sites' : ''}}
+  </div>
+
 </div>

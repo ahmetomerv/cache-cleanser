@@ -30,16 +30,16 @@ export class AppComponent implements OnInit {
     setTimeout(() => this.cleanCacheEnabled = this.cleanCacheEnabled, 0);
   }
 
-  connectToBackgroundScript(messagePayload): void {
+  connectToBackgroundScript(messagePayload: any): void {
     const message = messagePayload;
     const messageSendCallback = () => {};
 
     chrome.runtime.sendMessage(message, messageSendCallback);
   }
 
-  clearCacheClick(): void {
+  clearClick(): void {
     this.connectToBackgroundScript({
-      cacheCleanType: 'total'
+      cleanEvent: true
     });
   }
 
