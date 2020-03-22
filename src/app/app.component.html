@@ -5,18 +5,20 @@
 
   <div>
     <label for="cache-enabled-input">Enable cache clean: </label>
-    <input (change)="settingsInputChange($event)" [(ngModel)]="cleanCacheEnabled" id="cache-enabled-input" type="checkbox">
+    <input (change)="settingsInputChange($event)" [(ngModel)]="cacheCleanEnabled" id="cache-enabled-input" type="checkbox">
   </div>
 
   <div>
     <label for="cookies-enabled-input">Enable cookies clean: </label>
-    <input (change)="settingsInputChange($event)" [(ngModel)]="cleanCookiesEnabled" id="cookies-enabled-input" type="checkbox">
+    <input (change)="settingsInputChange($event)" [(ngModel)]="cookiesCleanEnabled" id="cookies-enabled-input" [disabled]="!cacheCleanEnabled" type="checkbox">
   </div>
+
+  <br>
 
   <div>
     <label for="whitelist-input">Whitelist: </label>
-    <input id="whitelist-input" [(ngModel)]="whitelistInputValue" type="text">
-    <button [disabled]="!whitelistInputValue" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
+    <input id="whitelist-input" [(ngModel)]="whitelistInputValue" [disabled]="!cacheCleanEnabled" type="text">
+    <button [disabled]="!whitelistInputValue && !cacheCleanEnabled" (click)="addToWhitelist(whitelistInputValue)">Add to Whitelist</button>
   </div>
 
   <div>
@@ -26,22 +28,22 @@
     <em class="settings-note" *ngIf="currentDomain && whitelist.length === 0">Example: {{ currentDomain }}</em>
   </div>
 
-  <ul *ngIf="this.whitelist.length" class="whitelist-container">
-    <li *ngFor="let url of whitelist">
+  <ul *ngIf="whitelist && whitelist.length > 0" class="whitelist-container">
+    <li *ngFor="let url of whitelist" [ngClass]="{'whitelist-item-disabled': !cacheCleanEnabled}">
       {{ url }} <i (click)="removeWhitelistItemClick(url)" class="fa fa-times whitelist-remove-icon"></i>
     </li>
   </ul>
 
   <div>
-    <button class="button" (click)="clearClick()">Manual Clear</button>
+    <button class="button" (click)="clearClick()" [disabled]="!cacheCleanEnabled">Manual Clear</button>
   </div>
 
   <div class="settings-note">
-    {{ whitelist.length > 0 && cleanCacheEnabled ? 'Cache will be cleaned only in sites included in the whitelist' :  cleanCacheEnabled ? 'Cache will be cleaned in all sites' : ''}}
+    {{ (whitelist && whitelist.length > 0) && cacheCleanEnabled ? 'Cache will be cleaned only in sites included in the whitelist' :  cacheCleanEnabled ? 'Cache will be cleaned in all sites' : ''}}
   </div>
 
   <div class="settings-note">
-    {{ whitelist.length > 0 && cleanCookiesEnabled ? 'Cookies will be cleaned only in sites included in the whitelist' :  cleanCookiesEnabled ? 'Cookies will be cleaned in all sites' : ''}}
+    {{ (whitelist && whitelist.length > 0) && cookiesCleanEnabled ? 'Cookies will be cleaned only in sites included in the whitelist' :  cookiesCleanEnabled ? 'Cookies will be cleaned in all sites' : ''}}
   </div>
 
 </div>

@@ -9,63 +9,51 @@ import Tab = chrome.tabs.Tab;
 export class AppComponent implements OnInit {
   constructor() {}
 
-  private cleanCacheEnabled: false;
-  private cleanCookiesEnabled: false;
+  private cacheCleanEnabled: false;
+  private cookiesCleanEnabled: false;
   private currentDomain: string;
   private whitelistInputValue: string = null;
   private whitelist: string[] = [];
 
   ngOnInit(): void {
-    chrome.storage.sync.get(['cleanCacheEnabled'], (result) => {
-      this.cleanCacheEnabled = result.cleanCacheEnabled;
-    });
-
-    chrome.storage.sync.get(['cleanCookiesEnabled'], (result) => {
-      this.cleanCookiesEnabled = result.cleanCookiesEnabled;
-    });
-
-    this.getWhitelistFromLocalStorage();
+    this.getLocalStorageData('cacheCleanEnabled').then((result: any) => this.cacheCleanEnabled = result);
+    this.getLocalStorageData('cookiesCleanEnabled').then((result: any) => this.cookiesCleanEnabled = result);
+    this.getLocalStorageData('whitelistItems').then((result: any) => this.whitelist = result && result.length ? result : []);
     this.setCurrentTabUrl();
 
-    setTimeout(() => this.cleanCacheEnabled = this.cleanCacheEnabled, 0);
+    setTimeout(() => this.cacheCleanEnabled = this.cacheCleanEnabled, 0);
   }
 
-  connectToBackgroundScript(messagePayload: any): void {
-    const message = messagePayload;
-    const messageSendCallback = () => {};
-
-    chrome.runtime.sendMessage(message, messageSendCallback);
+  sendRuntimeMessage(messagePayload: any): void {
+    if (messagePayload) {
+      const port = chrome.runtime.connect({ name: 'extension'} );
+      port.postMessage(messagePayload);
+    }
   }
 
   clearClick(): void {
-    this.connectToBackgroundScript({
-      cleanEvent: true
+    this.sendRuntimeMessage({
+      cleanButtonClick: true
     });
   }
 
   settingsInputChange(event: any): void {
-    chrome.storage.sync.set({
-        cleanCacheEnabled: this.cleanCacheEnabled,
-        cleanCookiesEnabled: this.cleanCookiesEnabled
-      }, () => {});
-  }
-
-  addToWhitelist(url: string): void {
-    this.whitelist.push(url);
-    this.whitelistInputValue = '';
-    this.updateWhitelistInLocalStorage();
-  }
-
-  getWhitelistFromLocalStorage(): void {
-    chrome.storage.sync.get(['whitelistItems'], (result) => {
-      if (result.whitelistItems) {
-        this.whitelist = result.whitelistItems;
-      }
+    this.setLocalStorageData({
+      cacheCleanEnabled: this.cacheCleanEnabled,
+      cookiesCleanEnabled: this.cookiesCleanEnabled
     });
   }
 
+  addToWhitelist(url: string): void {
+    if (url) {
+      this.whitelist.push(url);
+      this.whitelistInputValue = '';
+      this.updateWhitelistInLocalStorage();
+    }
+  }
+
   updateWhitelistInLocalStorage(): void {
-    chrome.storage.sync.set({whitelistItems: this.whitelist}, () => {});
+    this.setLocalStorageData({ whitelistItems: this.whitelist });
   }
 
   removeWhitelistItemClick(url: string): void {
@@ -78,6 +66,26 @@ export class AppComponent implements OnInit {
       const domain = (new URL(tab.url)).hostname;
       this.currentDomain = domain;
     });
+  }
+
+  getLocalStorageData(key: string): Promise<any> {
+    if (key && typeof key === 'string') {
+      return new Promise((resolve, reject) => {
+          chrome.storage.sync.get(key, (result: any) => {
+              chrome.runtime.lastError
+                ? reject(Error(chrome.runtime.lastError.message))
+                : resolve(result[key]);
+            }
+          );
+        }
+      );
+    }
+  }
+
+  setLocalStorageData(dataObj: any): void {
+    if (dataObj && typeof dataObj !== null) {
+      chrome.storage.sync.set(dataObj, () => {});
+    }
   }
 
 }

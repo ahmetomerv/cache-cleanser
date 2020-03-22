@@ -12,6 +12,10 @@
     margin-left: .5em;
     cursor: pointer;
   }
+
+  li.whitelist-item-disabled {
+    color: darkgrey;
+  }
 }
 
 .settings-note {

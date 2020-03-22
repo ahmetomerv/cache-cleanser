@@ -1,25 +1,32 @@
 import Tab = chrome.tabs.Tab;
+import DataTypeSet = chrome.browsingData.DataTypeSet;
+import Port = chrome.runtime.Port;
 
 console.log('background.ts run.');
 
 (() => {
-  let cacheCleanRunning: boolean;
+  let whitelist: string[];
+  let cleanRunning: boolean;
+  let cacheCleanEnabled: boolean;
+  let cookiesCleanEnabled: boolean;
+  let runtimePort: Port;
 
-  chrome.runtime.onMessage.addListener(onMessageReceiver);
+  chrome.runtime.onConnect.addListener((port: Port): void => {
+    runtimePort = port;
+    console.log(port.name);
+    port.onMessage.addListener((msg): any => {
+      console.log(msg);
+      if (msg.onLoad || msg.cleanButtonClick) {
+        getLocalStorageData('whitelistItems').then((result: any) => whitelist = result);
+        getLocalStorageData('cleanRunning').then((result: any) => cleanRunning = result);
+        getLocalStorageData('cacheCleanEnabled').then((result: any) => cacheCleanEnabled = result);
+        getLocalStorageData('cookiesCleanEnabled').then((result: any) => cookiesCleanEnabled = result);
+        clean();
+      }
 
-  async function onMessageReceiver(message, sender, sendResponse): Promise<void> {
-    let whitelist: string;
-    let cleanCacheEnabled: boolean;
-
-    await getLocalStorageData('cleanCacheEnabled').then((result: any) => cleanCacheEnabled = result);
-    await getLocalStorageData('whitelistItems').then((result: any) => whitelist = result);
-
-    if (cleanCacheEnabled) {
-      totalCacheClean();
-    } else if (whitelist && whitelist.length > 0) {
-      whitelistCacheClean();
-    }
-  }
+      return true;
+    });
+  });
 
   function getLocalStorageData(key: string): Promise<any> {
     if (key && typeof key === 'string') {
@@ -48,71 +55,65 @@ console.log('background.ts run.');
     return domain;
   }
 
-  function bypassCacheReload(): void {
-    console.log('bypassCacheReload was called.');
-    if (!cacheCleanRunning) {
-      chrome.tabs.reload({
-        bypassCache: true
-      });
+  function sendOneTimeRequest(messagePayload: any): void {
+    if (messagePayload) {
+      const message = messagePayload;
+      const messageSendCallback = () => {};
+
+      chrome.runtime.sendMessage(message, messageSendCallback);
     }
   }
 
-  function cleanCacheCallback(): void {
-    cacheCleanRunning = false;
-    console.log('cleanCacheCallback was called.');
+  function sendRuntimeMessage(messagePayload: any): void {
+    if (messagePayload && runtimePort) {
+      chrome.runtime.connect({ name: 'background'} );
+      runtimePort.postMessage(messagePayload);
+    }
   }
 
-  async function totalCacheClean(): Promise<void> {
-    console.log('totalCacheClean was called.');
-    const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
-    const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
-    let cleanCookiesEnabled: boolean;
+  function cleanCallback(): void {
+    cleanRunning = false;
+    sendOneTimeRequest({
+      canReload: true
+    });
+    console.log('cleanCallback called.');
+  }
 
-    await getLocalStorageData('cleanCookiesEnabled').then((result: any) => cleanCookiesEnabled = result);
+  function clean(): void {
+    if (!cleanRunning && cacheCleanEnabled) {
+      getLocalStorageData('whitelistItems').then((result: any) => whitelist = result);
+      getLocalStorageData('cleanRunning').then((result: any) => cleanRunning = result);
+      getLocalStorageData('cacheCleanEnabled').then((result: any) => cacheCleanEnabled = result);
+      getLocalStorageData('cookiesCleanEnabled').then((result: any) => cookiesCleanEnabled = result);
 
-    if (!cacheCleanRunning) {
-      cacheCleanRunning = true;
-      chrome.browsingData.remove({
-        since: oneWeekAgo
-      }, {
+      const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
+      const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
+      const dataToRemove: DataTypeSet = {
         appcache: true,
         cache: true,
-        cookies: cleanCookiesEnabled,
+        cookies: cookiesCleanEnabled,
         indexedDB: true,
         localStorage: true,
         serviceWorkers: true,
         webSQL: true
-      }, cleanCacheCallback);
-    }
-  }
-
-  async function whitelistCacheClean(): Promise<void> {
-    console.log('whitelistCacheClean was called.');
-    if (!cacheCleanRunning) {
-      const millisecondsPerWeek = 1000 * 60 * 60 * 24 * 7;
-      const oneWeekAgo = (new Date()).getTime() - millisecondsPerWeek;
-      let whitelist: string;
-      let cleanCookiesEnabled: boolean;
-
-      await getLocalStorageData('whitelistItems').then((result: any) => whitelist = result);
-      await getLocalStorageData('cleanCookiesEnabled').then((result: any) => cleanCookiesEnabled = result);
+      };
 
       if (whitelist && whitelist.length > 0) {
-        cacheCleanRunning = true;
-
+        console.log('whitelist clean called');
+        console.log(whitelist);
+        cleanRunning = true;
         chrome.browsingData.remove({
           // @ts-ignore
           origins: [...whitelist],
           since: oneWeekAgo
-        }, {
-          appcache: true,
-          cache: true,
-          cookies: cleanCookiesEnabled,
-          indexedDB: true,
-          localStorage: true,
-          serviceWorkers: true,
-          webSQL: true
-        }, cleanCacheCallback);
+        }, dataToRemove, cleanCallback);
+      } else {
+        console.log('default clean called');
+        cleanRunning = true;
+        chrome.browsingData.remove({
+          // @ts-ignore
+          since: oneWeekAgo
+        }, dataToRemove, cleanCallback);
       }
     }
   }
